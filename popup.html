@@ -89,6 +89,7 @@
     cursor: pointer;
   }
   #group-btn:hover { background: #357abd; }
+  #group-btn:disabled { background: #ccc; cursor: default; }
   #group-msg {
     font-size: 11px;
     color: #4a90d9;
@@ -96,6 +97,51 @@
     padding: 0 0 8px;
     min-height: 16px;
   }
+  #group-preview {
+    margin: 0 12px 10px;
+    border: 1px solid #c8dff5;
+    border-radius: 8px;
+    overflow: hidden;
+    display: none;
+  }
+  #group-preview .preview-title {
+    background: #e8f2fc;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2a6099;
+    border-bottom: 1px solid #c8dff5;
+  }
+  #group-preview .preview-row {
+    padding: 5px 10px;
+    font-size: 12px;
+    color: #333;
+    border-bottom: 1px solid #f0f4f8;
+    display: flex;
+    justify-content: space-between;
+  }
+  #group-preview .preview-row:last-of-type { border-bottom: none; }
+  #group-preview .preview-count { color: #888; font-size: 11px; }
+  #group-preview .preview-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+    border-top: 1px solid #c8dff5;
+    background: #f5f9ff;
+  }
+  #group-preview .preview-actions button {
+    flex: 1;
+    padding: 6px;
+    border: none;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  #confirm-btn { background: #4a90d9; color: #fff; }
+  #confirm-btn:hover { background: #357abd; }
+  #cancel-btn { background: #eee; color: #555; }
+  #cancel-btn:hover { background: #ddd; }
 </style>
 </head>
 <body>
@@ -105,6 +151,14 @@
 </header>
 <button id="group-btn">🗂 按标题归类标签</button>
 <div id="group-msg"></div>
+<div id="group-preview">
+  <div class="preview-title">将创建以下分组，确认执行？</div>
+  <div id="preview-rows"></div>
+  <div class="preview-actions">
+    <button id="cancel-btn">取消</button>
+    <button id="confirm-btn">确认归类</button>
+  </div>
+</div>
 <div id="list"></div>
 <script src="popup.js"></script>
 </body>

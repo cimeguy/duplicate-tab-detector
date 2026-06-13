@@ -2,16 +2,50 @@ const list = document.getElementById('list');
 const summary = document.getElementById('summary');
 const groupBtn = document.getElementById('group-btn');
 const groupMsg = document.getElementById('group-msg');
+const groupPreview = document.getElementById('group-preview');
+const previewRows = document.getElementById('preview-rows');
+const confirmBtn = document.getElementById('confirm-btn');
+const cancelBtn = document.getElementById('cancel-btn');
+
+let pendingGroups = [];
 
 groupBtn.addEventListener('click', () => {
   groupBtn.disabled = true;
-  groupBtn.textContent = '归类中…';
-  chrome.runtime.sendMessage({ type: 'groupByTitle' }, ({ groupCount }) => {
+  groupBtn.textContent = '分析中…';
+  chrome.runtime.sendMessage({ type: 'previewGroupByTitle' }, ({ groups }) => {
     groupBtn.disabled = false;
     groupBtn.textContent = '🗂 按标题归类标签';
-    groupMsg.textContent = groupCount > 0
-      ? `已创建 ${groupCount} 个分组 ✓`
-      : '没有可归类的标签（需同一网站 2 个以上）';
+    if (!groups.length) {
+      groupMsg.textContent = '没有可归类的标签（需同一网站 2 个以上）';
+      setTimeout(() => { groupMsg.textContent = ''; }, 3000);
+      return;
+    }
+    pendingGroups = groups;
+    previewRows.innerHTML = '';
+    for (const g of groups) {
+      const row = document.createElement('div');
+      row.className = 'preview-row';
+      row.innerHTML = `<span>${g.site}</span><span class="preview-count">${g.count} 个标签</span>`;
+      previewRows.appendChild(row);
+    }
+    groupPreview.style.display = 'block';
+  });
+});
+
+cancelBtn.addEventListener('click', () => {
+  groupPreview.style.display = 'none';
+  pendingGroups = [];
+});
+
+confirmBtn.addEventListener('click', () => {
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = '归类中…';
+  chrome.runtime.sendMessage({ type: 'groupByTitle' }, ({ groupCount }) => {
+    groupPreview.style.display = 'none';
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = '确认归类';
+    pendingGroups = [];
+    groupMsg.textContent = `已创建 ${groupCount} 个分组 ✓`;
     setTimeout(() => { groupMsg.textContent = ''; }, 3000);
   });
 });

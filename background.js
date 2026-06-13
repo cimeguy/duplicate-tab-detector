@@ -119,6 +119,10 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     groupTabsByTitle().then(result => sendResponse(result));
     return true;
   }
+  if (msg.type === 'previewGroupByTitle') {
+    previewGroupByTitle().then(result => sendResponse(result));
+    return true;
+  }
 });
 
 // 从标题提取网站名，如 "文章标题 - GitHub" → "GitHub"
@@ -138,6 +142,23 @@ function extractSiteName(title, url) {
 }
 
 const GROUP_COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
+
+async function previewGroupByTitle() {
+  const tabs = await chrome.tabs.query({ currentWindow: true });
+  const siteMap = new Map();
+  for (const tab of tabs) {
+    if (!isScriptable(tab.url)) continue;
+    const site = extractSiteName(tab.title, tab.url);
+    if (!siteMap.has(site)) siteMap.set(site, []);
+    siteMap.get(site).push({ id: tab.id, title: tab.title });
+  }
+  const groups = [];
+  for (const [site, tabs] of siteMap) {
+    if (tabs.length < 2) continue;
+    groups.push({ site, count: tabs.length, tabIds: tabs.map(t => t.id) });
+  }
+  return { groups };
+}
 
 async function groupTabsByTitle() {
   const tabs = await chrome.tabs.query({ currentWindow: true });
