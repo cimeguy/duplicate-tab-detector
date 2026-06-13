@@ -115,4 +115,56 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       setTimeout(refreshAll, 200);
     });
   }
+  if (msg.type === 'groupByTitle') {
+    groupTabsByTitle().then(result => sendResponse(result));
+    return true;
+  }
 });
+
+// 从标题提取网站名，如 "文章标题 - GitHub" → "GitHub"
+function extractSiteName(title, url) {
+  if (title) {
+    const sep = [' - ', ' | ', ' – ', ' · ', ' • '];
+    for (const s of sep) {
+      const parts = title.split(s);
+      if (parts.length > 1) return parts[parts.length - 1].trim();
+    }
+  }
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return '其他';
+  }
+}
+
+const GROUP_COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
+
+async function groupTabsByTitle() {
+  const tabs = await chrome.tabs.query({ currentWindow: true });
+
+  // 按网站名归类
+  const siteMap = new Map();
+  for (const tab of tabs) {
+    if (!isScriptable(tab.url)) continue;
+    const site = extractSiteName(tab.title, tab.url);
+    if (!siteMap.has(site)) siteMap.set(site, []);
+    siteMap.get(site).push(tab.id);
+  }
+
+  let colorIdx = 0;
+  let groupCount = 0;
+
+  for (const [site, tabIds] of siteMap) {
+    if (tabIds.length < 2) continue; // 只归类有 2 个以上标签的网站
+    const groupId = await chrome.tabs.group({ tabIds });
+    await chrome.tabGroups.update(groupId, {
+      title: site,
+      color: GROUP_COLORS[colorIdx % GROUP_COLORS.length],
+      collapsed: false,
+    });
+    colorIdx++;
+    groupCount++;
+  }
+
+  return { groupCount };
+}

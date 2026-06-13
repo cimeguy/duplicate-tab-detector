@@ -76,6 +76,26 @@
     text-align: center;
     padding: 0 0 10px;
   }
+  #group-btn {
+    margin: 0 12px 10px;
+    width: calc(100% - 24px);
+    padding: 7px;
+    background: #4a90d9;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  #group-btn:hover { background: #357abd; }
+  #group-msg {
+    font-size: 11px;
+    color: #4a90d9;
+    text-align: center;
+    padding: 0 0 8px;
+    min-height: 16px;
+  }
 </style>
 </head>
 <body>
@@ -83,6 +103,8 @@
   <h1>⚠ 重复标签</h1>
   <span id="summary">检测中…</span>
 </header>
+<button id="group-btn">🗂 按标题归类标签</button>
+<div id="group-msg"></div>
 <div id="list"></div>
 <script src="popup.js"></script>
 </body>

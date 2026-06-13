@@ -1,5 +1,20 @@
 const list = document.getElementById('list');
 const summary = document.getElementById('summary');
+const groupBtn = document.getElementById('group-btn');
+const groupMsg = document.getElementById('group-msg');
+
+groupBtn.addEventListener('click', () => {
+  groupBtn.disabled = true;
+  groupBtn.textContent = '归类中…';
+  chrome.runtime.sendMessage({ type: 'groupByTitle' }, ({ groupCount }) => {
+    groupBtn.disabled = false;
+    groupBtn.textContent = '🗂 按标题归类标签';
+    groupMsg.textContent = groupCount > 0
+      ? `已创建 ${groupCount} 个分组 ✓`
+      : '没有可归类的标签（需同一网站 2 个以上）';
+    setTimeout(() => { groupMsg.textContent = ''; }, 3000);
+  });
+});
 
 function render(groups) {
   list.innerHTML = '';

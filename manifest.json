@@ -3,7 +3,7 @@
   "name": "重复标签检测",
   "version": "1.0",
   "description": "检测并高亮重复打开的标签页",
-  "permissions": ["tabs", "scripting"],
+  "permissions": ["tabs", "scripting", "tabGroups"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
