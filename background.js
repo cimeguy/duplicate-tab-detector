@@ -66,6 +66,8 @@ async function applyBanner(tabId, isDuplicate, count, color) {
             link.href = origFavicon;
             delete window[FAVICON_KEY];
           }
+          // 版本号自增，作废任何还在飞行中的 img.onload 回调
+          window.__dup_fav_gen__ = (window.__dup_fav_gen__ || 0) + 1;
           return;
         }
 
@@ -105,7 +107,9 @@ async function applyBanner(tabId, isDuplicate, count, color) {
         canvas.width = canvas.height = sz;
         const ctx = canvas.getContext('2d');
         const origSrc = window[FAVICON_KEY];
+        const gen = window.__dup_fav_gen__ = (window.__dup_fav_gen__ || 0) + 1;
         const draw = () => {
+          if (window.__dup_fav_gen__ !== gen) return; // 已被更新的还原调用作废
           ctx.beginPath();
           ctx.arc(sz * 0.72, sz * 0.72, sz * 0.26, 0, Math.PI * 2);
           ctx.fillStyle = c1;
