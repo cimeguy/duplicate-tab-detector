@@ -68,12 +68,16 @@ async function applyBanner(tabId, isDuplicate, count, color) {
           }
           // 版本号自增，作废任何还在飞行中的 img.onload 回调
           window.__dup_fav_gen__ = (window.__dup_fav_gen__ || 0) + 1;
+          delete window.__dup_banner_dismissed_count__;
           return;
         }
 
         const [c1, c2] = color;
 
         // ── 横幅 ──
+        // 用户在当前 count 下手动关闭过，不重复显示
+        if (window.__dup_banner_dismissed_count__ === count) return;
+
         let el = document.getElementById(ID);
         if (!el) {
           el = document.createElement('div');
@@ -86,8 +90,31 @@ async function applyBanner(tabId, isDuplicate, count, color) {
           'color:#fff', 'font:bold 13px/32px -apple-system,sans-serif',
           'text-align:center', 'letter-spacing:.3px',
           'box-shadow:0 2px 6px rgba(0,0,0,.25)', 'cursor:default',
+          'display:flex', 'align-items:center', 'justify-content:center',
         ].join(';');
-        el.textContent = `⚠  此页面已重复打开 ${count} 次`;
+
+        const msg = document.createElement('span');
+        msg.textContent = `⚠  此页面已重复打开 ${count} 次`;
+        msg.style.flex = '1';
+
+        const closeBtn = document.createElement('span');
+        closeBtn.textContent = '✕';
+        closeBtn.style.cssText = [
+          'position:absolute', 'right:10px', 'top:0', 'bottom:0',
+          'display:flex', 'align-items:center',
+          'font-size:14px', 'font-weight:bold', 'opacity:.8',
+          'cursor:pointer', 'padding:0 4px', 'user-select:none',
+        ].join(';');
+        closeBtn.onmouseenter = () => { closeBtn.style.opacity = '1'; };
+        closeBtn.onmouseleave = () => { closeBtn.style.opacity = '.8'; };
+        closeBtn.addEventListener('click', () => {
+          window.__dup_banner_dismissed_count__ = count;
+          el.remove();
+        });
+
+        el.innerHTML = '';
+        el.appendChild(msg);
+        el.appendChild(closeBtn);
 
         // ── 标题前缀 ──
         if (window[TITLE_KEY] === undefined) {
