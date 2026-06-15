@@ -100,13 +100,15 @@ async function applyBanner(tabId, isDuplicate, count, color) {
         const closeBtn = document.createElement('span');
         closeBtn.textContent = '✕';
         closeBtn.style.cssText = [
-          'position:absolute', 'right:10px', 'top:0', 'bottom:0',
-          'display:flex', 'align-items:center',
-          'font-size:14px', 'font-weight:bold', 'opacity:.8',
-          'cursor:pointer', 'padding:0 4px', 'user-select:none',
+          'position:absolute', 'right:8px', 'top:50%', 'transform:translateY(-50%)',
+          'display:flex', 'align-items:center', 'justify-content:center',
+          'width:20px', 'height:20px', 'border-radius:50%',
+          'background:rgba(0,0,0,.25)',
+          'font-size:13px', 'font-weight:bold', 'line-height:1',
+          'cursor:pointer', 'user-select:none', 'transition:background .15s',
         ].join(';');
-        closeBtn.onmouseenter = () => { closeBtn.style.opacity = '1'; };
-        closeBtn.onmouseleave = () => { closeBtn.style.opacity = '.8'; };
+        closeBtn.onmouseenter = () => { closeBtn.style.background = 'rgba(0,0,0,.45)'; };
+        closeBtn.onmouseleave = () => { closeBtn.style.background = 'rgba(0,0,0,.25)'; };
         closeBtn.addEventListener('click', () => {
           window.__dup_banner_dismissed_count__ = count;
           el.remove();
